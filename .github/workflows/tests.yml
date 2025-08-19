@@ -22,13 +22,9 @@ jobs:
         run: pip install uv
       - name: Create uv virtual environment
         run: uv venv .venv
-      - name: Activate uv virtual environment
-        run: |
-          source .venv/bin/activate
-          echo VIRTUAL_ENV=$VIRTUAL_ENV
       - name: Install dependencies with uv
-        run: .venv/bin/uv pip install -e .
+        run: uv pip install -e . --python=.venv/bin/python
       - name: Install pytest
-        run: .venv/bin/uv pip install pytest
+        run: uv pip install pytest --python=.venv/bin/python
       - name: Run tests
         run: .venv/bin/pytest
