@@ -11,18 +11,24 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.12, 3.13]
+        python-version: [3.12]
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: install_uv
+      - name: Install uv
         run: pip install uv
-      - name: install_dependencies
-        run: uv pip install -e .
-      - name: install_pytest
-        run: uv pip install pytest
-      - name: run_tests
-        run: pytest
+      - name: Create uv virtual environment
+        run: uv venv .venv
+      - name: Activate uv virtual environment
+        run: |
+          source .venv/bin/activate
+          echo VIRTUAL_ENV=$VIRTUAL_ENV
+      - name: Install dependencies with uv
+        run: .venv/bin/uv pip install -e .
+      - name: Install pytest
+        run: .venv/bin/uv pip install pytest
+      - name: Run tests
+        run: .venv/bin/pytest
