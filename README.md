@@ -1,16 +1,19 @@
+
 # ruffit
 
-A Python CLI tool for monitoring `.py` files and automatically running code quality checks and formatting.
+A modern Python CLI tool to monitor `.py` files and automatically run code quality checks and formatting on change.
 
 ## Features
-- Watches for changes to Python files in any folder you specify
-- Debounces rapid file events to avoid duplicate triggers
+
+- **Watches** for changes to Python files in any folder you specify
+- **Debounces** rapid file events to avoid duplicate triggers
 - On modification, automatically runs:
   - `ruff format` to auto-format code
-  - `ruff check` to lint and check for code issues
+  - `ruff check` to lint and check for code issues (with optional autofix)
   - `ty check` to check type annotations
-- Rich terminal output for clear, colorful feedback
-- Flexible CLI: monitor any folder by name, or the whole project
+- **Rich terminal output** for clear, colorful feedback
+- **Flexible CLI**: monitor any folder or the whole project
+- **Easy to extend and test** (modular code, pytest support)
 
 ## Installation
 
@@ -34,7 +37,17 @@ Monitor only a specific folder (e.g., `tests`):
 ruffit tests
 ```
 
-If the folder does not exist, ruffit will print an error.
+Enable autofix with ruff check:
+```sh
+ruffit . --autofix
+```
+
+If the folder does not exist, ruffit will give an error and exit.
+
+## CLI Options
+
+- `folder` (argument): Folder to monitor (default: current directory). Use `all` to monitor the whole project, or just leave it blank.
+- `--autofix`: Enable autofix with ruff check.
 
 ## Development & Testing
 
@@ -49,16 +62,20 @@ If the folder does not exist, ruffit will print an error.
   ```
 
 ## Contributing
+
 Pull requests and issues are welcome!
 
 ## License
+
 MIT
 
 ## Troubleshooting: Command Not Found
 
 If you see an error like:
 
-    'ruffit' is not recognized as the name of a cmdlet, function, script file, or operable program.
+```
+'ruffit' is not recognized as the name of a cmdlet, function, script file, or operable program.
+```
 
 This usually means the Python Scripts directory is not in your PATH, or you are not in the correct virtual environment.
 
