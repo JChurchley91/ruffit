@@ -1,7 +1,7 @@
 [project]
 
 name = "ruffit"
-version = "0.1.1"
+version = "0.1.2"
 description = "Monitor Python files and auto-run ruff, ty, and formatting checks on change. Fast, colorful, and easy CLI for code quality automation."
 authors = [{ name = "Joseph Churchley", email = "joseph.churchley@outlook.com" }]
 readme = "README.md"
@@ -11,11 +11,12 @@ dependencies = [
     "rich>=14.1.0",
     "ruff>=0.12.9",
     "ty>=0.0.1a18",
+    "typer>=0.16.1",
     "watchdog>=6.0.0",
 ]
 
 [project.scripts]
-ruffit = "ruffit.run:main"
+ruffit = "ruffit.run:app"
 
 [build-system]
 requires = ["setuptools>=61.0"]
