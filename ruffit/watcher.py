@@ -44,6 +44,7 @@ class PyFileMonitor(FileSystemEventHandler):
             event.src_path
         ):
             if not self._debounced(event.src_path):
+                self.console.clear()
                 self.console.print(
                     f"[bold yellow]Modified:[/bold yellow] {event.src_path}"
                 )

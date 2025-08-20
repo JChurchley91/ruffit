@@ -18,7 +18,6 @@ def main(
     """
     Start the file monitor.
     """
-    print(f"folder type: {type(folder)} value: {folder}")
     if folder != "." and folder != "all" and not os.path.isdir(folder):
         Console().print(
             f"Folder '{folder}' does not exist; cannot monitor it.", style="bold red"
