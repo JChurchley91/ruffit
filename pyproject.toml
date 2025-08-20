@@ -1,7 +1,7 @@
 [project]
 
 name = "ruffit"
-version = "0.1.2"
+version = "0.1.3"
 description = "Monitor Python files and auto-run ruff, ty, and formatting checks on change. Fast, colorful, and easy CLI for code quality automation."
 authors = [{ name = "Joseph Churchley", email = "joseph.churchley@outlook.com" }]
 readme = "README.md"
@@ -21,3 +21,9 @@ ruffit = "ruffit.run:app"
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.ty.src]
+exclude = ["tests"]
+
+[tool.ty.rules]
+unresolved-import = "ignore"
