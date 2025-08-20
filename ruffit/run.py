@@ -1,5 +1,6 @@
 import typer
 from rich.console import Console
+from rich.panel import Panel
 import os
 from .watcher import PyFileMonitor
 
@@ -20,7 +21,12 @@ def main(
     """
     if folder != "." and folder != "all" and not os.path.isdir(folder):
         Console().print(
-            f"Folder '{folder}' does not exist; cannot monitor it.", style="bold red"
+            Panel(
+                f"Folder '{folder}' does not exist; cannot monitor it.",
+                title="error",
+                border_style="red",
+                title_align="left",
+            )
         )
         raise typer.Exit(1)
     path = "." if folder == "all" else folder
