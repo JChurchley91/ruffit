@@ -2,9 +2,9 @@ name: run_code_quality_checks
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   ruff_code_quality_check:
