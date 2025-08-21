@@ -14,23 +14,24 @@ def test_on_modified_triggers_utils(tmp_path):
     file_path = tmp_path / "test.py"
     file_path.write_text("print('hi')")
     event = DummyEvent(str(file_path))
-
     with (
         patch("ruffit.watcher.run_ruff_format") as mock_format,
         patch("ruffit.watcher.run_ruff_check") as mock_ruff,
         patch("ruffit.watcher.run_ty_check") as mock_ty,
         patch.object(monitor, "console") as mock_console,
-        patch.object(monitor, "_is_own_library", return_value=False),
+        patch.object(monitor, "_should_ignore", return_value=False),
         patch.object(monitor, "_debounced", return_value=False),
     ):
         monitor.on_modified(event)  # type: ignore
-        mock_console.print.assert_any_call(
-            f"[bold yellow]Modified:[/bold yellow] {str(file_path)}"
-        )
+        # Check that a Panel with the correct text is printed
+        found = False
+        for call in mock_console.print.call_args_list:
+            panel = call.args[0]
+            if hasattr(panel, "renderable") and "Modified:" in str(panel.renderable) and str(file_path) in str(panel.renderable):
+                found = True
+        assert found, "Expected Panel with 'Modified:' and file path not found in console output"
         mock_format.assert_called_once_with(str(file_path), monitor.console)
-        mock_ruff.assert_called_once_with(
-            str(file_path), monitor.console, autofix=monitor.autofix
-        )
+        mock_ruff.assert_called_once_with(str(file_path), monitor.console, autofix=monitor.autofix)
         mock_ty.assert_called_once_with(str(file_path), monitor.console)
 
 
@@ -41,9 +42,13 @@ def test_on_created_prints(tmp_path):
     event = DummyEvent(str(file_path))
     with patch.object(monitor, "console") as mock_console:
         monitor.on_created(event)  # type: ignore
-        mock_console.print.assert_called_once_with(
-            f"[bold cyan]Created:[/bold cyan] {str(file_path)}"
-        )
+        # Check that a Panel with the correct text is printed
+        found = False
+        for call in mock_console.print.call_args_list:
+            panel = call.args[0]
+            if hasattr(panel, "renderable") and "Created:" in str(panel.renderable) and str(file_path) in str(panel.renderable):
+                found = True
+        assert found, "Expected Panel with 'Created:' and file path not found in console output"
 
 
 def test_ignores_non_py_files(tmp_path):
@@ -54,7 +59,8 @@ def test_ignores_non_py_files(tmp_path):
     with patch.object(monitor, "console") as mock_console:
         monitor.on_modified(event)  # type: ignore
         monitor.on_created(event)  # type: ignore
-        mock_console.print.assert_not_called()
+        # Should not print anything for non-py files
+        assert not mock_console.print.called
 
 
 def test_ruff_check_error_message(tmp_path):
@@ -66,11 +72,11 @@ def test_ruff_check_error_message(tmp_path):
         with patch("rich.console.Console") as mock_console_class:
             mock_console = mock_console_class.return_value
             utils.run_ruff_check(str(file_path), mock_console)
-            found = any(
-                "Ruff check issues for" in str(call.args[0])
-                and "E999 SyntaxError: invalid syntax" in str(call.args[0])
-                for call in mock_console.print.call_args_list
-            )
+            found = False
+            for call in mock_console.print.call_args_list:
+                panel = call.args[0]
+                if hasattr(panel, "renderable") and "ruff check issues for" in str(panel.renderable) and "E999 SyntaxError: invalid syntax" in str(panel.renderable):
+                    found = True
             assert found, "Expected error message not found in console output"
 
 
@@ -87,10 +93,9 @@ def test_debounce_prevents_duplicate(tmp_path):
     ):
         monitor.on_modified(event)  # type: ignore
         monitor.on_modified(event)  # type: ignore
-        # Only one "Modified:" print should occur
+        # Only one Panel with "Modified:" should be printed
         modified_calls = [
-            call
-            for call in mock_console.print.call_args_list
-            if "Modified:" in str(call.args[0])
+            call for call in mock_console.print.call_args_list
+            if hasattr(call.args[0], "renderable") and "Modified:" in str(call.args[0].renderable)
         ]
         assert len(modified_calls) == 1
